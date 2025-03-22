@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    environment:
+      POSTGRES_USER: api
+      POSTGRES_PASSWORD: pwd
+      POSTGRES_DB: todo
+    ports:
+      - "5433:5432"
+    volumes:
+      - C:\docker-data\postgres\go-sample:/var/lib/postgresql/data
