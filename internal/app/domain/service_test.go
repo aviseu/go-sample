@@ -25,8 +25,8 @@ func (suite *ServiceSuite) TestAllSuccess() {
 	id1 := uuid.New()
 	id2 := uuid.New()
 	r := testutils.NewTaskRepository(
-		testutils.TaskRepositoryWithTask(&domain.Task{ID: id1, Title: "task 1", Completed: false}),
 		testutils.TaskRepositoryWithTask(&domain.Task{ID: id2, Title: "task 2", Completed: true}),
+		testutils.TaskRepositoryWithTask(&domain.Task{ID: id1, Title: "task 1", Completed: false}),
 	)
 	s := domain.NewService(r)
 
