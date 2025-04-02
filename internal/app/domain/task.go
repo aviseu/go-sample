@@ -16,6 +16,6 @@ func NewTask(id uuid.UUID, title string, completed bool) *Task {
 	}
 }
 
-func (t *Task) MarkCompleted() {
+func (t *Task) markCompleted() {
 	t.Completed = true
 }

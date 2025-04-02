@@ -39,7 +39,7 @@ func (s *Service) MarkCompleted(ctx context.Context, id uuid.UUID) error {
 		return fmt.Errorf("failed to find task: %w", err)
 	}
 
-	task.MarkCompleted()
+	task.markCompleted()
 	if err := s.r.Save(ctx, task); err != nil {
 		return fmt.Errorf("failed to save task: %w", err)
 	}
