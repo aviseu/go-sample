@@ -24,7 +24,7 @@ func (s *Service) Create(ctx context.Context, title string) (*Task, error) {
 		return nil, ErrTitleIsRequired
 	}
 
-	task := &Task{ID: uuid.New(), Title: title}
+	task := NewTask(uuid.New(), title, false)
 
 	if err := s.r.Save(ctx, task); err != nil {
 		return nil, fmt.Errorf("failed to save task: %w", err)
@@ -39,7 +39,7 @@ func (s *Service) MarkCompleted(ctx context.Context, id uuid.UUID) error {
 		return fmt.Errorf("failed to find task: %w", err)
 	}
 
-	task.Completed = true
+	task.MarkCompleted()
 	if err := s.r.Save(ctx, task); err != nil {
 		return fmt.Errorf("failed to save task: %w", err)
 	}
