@@ -1,21 +1,40 @@
 package domain
 
-import "github.com/google/uuid"
+import (
+	"github.com/aviseu/go-sample/internal/app/infrastructure/aggregators"
+	"github.com/google/uuid"
+)
 
-type Task struct {
-	ID        uuid.UUID `json:"id" db:"id"`
-	Title     string    `json:"title" db:"title"`
-	Completed bool      `json:"completed" db:"completed"`
+type task struct {
+	id        uuid.UUID
+	title     string
+	completed bool
 }
 
-func NewTask(id uuid.UUID, title string, completed bool) *Task {
-	return &Task{
-		ID:        id,
-		Title:     title,
-		Completed: completed,
+func newTask(id uuid.UUID, title string, completed bool) *task {
+	return &task{
+		id:        id,
+		title:     title,
+		completed: completed,
 	}
 }
 
-func (t *Task) markCompleted() {
-	t.Completed = true
+func (t *task) markCompleted() {
+	t.completed = true
+}
+
+func newFromAggregator(t *aggregators.Task) *task {
+	return &task{
+		id:        t.ID,
+		title:     t.Title,
+		completed: t.Completed,
+	}
+}
+
+func (t *task) toAggregator() *aggregators.Task {
+	return &aggregators.Task{
+		ID:        t.id,
+		Title:     t.title,
+		Completed: t.completed,
+	}
 }

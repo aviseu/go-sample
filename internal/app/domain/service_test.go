@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/aviseu/go-sample/internal/app/domain"
+	"github.com/aviseu/go-sample/internal/app/infrastructure/aggregators"
 	"github.com/aviseu/go-sample/internal/errs"
 	"github.com/aviseu/go-sample/internal/testutils"
 	"github.com/google/uuid"
@@ -77,7 +78,7 @@ func (suite *ServiceSuite) TestCreateRepositoryFail() {
 func (suite *ServiceSuite) TestMarkCompletedSuccess() {
 	// Prepare
 	id := uuid.New()
-	r := testutils.NewTaskRepository(testutils.TaskRepositoryWithTask(&domain.Task{ID: id, Title: "task 1", Completed: false}))
+	r := testutils.NewTaskRepository(testutils.TaskRepositoryWithTask(&aggregators.Task{ID: id, Title: "task 1", Completed: false}))
 	s := domain.NewService(r)
 
 	// Execute

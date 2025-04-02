@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/aviseu/go-sample/internal/app/domain"
+	"github.com/aviseu/go-sample/internal/app/infrastructure"
+	"github.com/aviseu/go-sample/internal/app/infrastructure/aggregators"
 	"github.com/aviseu/go-sample/internal/errs"
 	"github.com/go-chi/chi/v5"
 	"github.com/google/uuid"
@@ -13,8 +15,8 @@ import (
 )
 
 type Repository interface {
-	All(ctx context.Context) ([]*domain.Task, error)
-	Find(ctx context.Context, id uuid.UUID) (*domain.Task, error)
+	All(ctx context.Context) ([]*aggregators.Task, error)
+	Find(ctx context.Context, id uuid.UUID) (*aggregators.Task, error)
 }
 
 type Handler struct {
@@ -67,11 +69,6 @@ func (h *Handler) Create(w http.ResponseWriter, r *http.Request) {
 
 	task, err := h.s.Create(r.Context(), req.Title)
 	if err != nil {
-		if errors.Is(err, domain.ErrTaskNotFound) {
-			h.handleFail(err, http.StatusNotFound, w)
-			return
-		}
-
 		if errs.IsValidationError(err) {
 			h.handleFail(err, http.StatusBadRequest, w)
 			return
@@ -120,7 +117,7 @@ func (h *Handler) Find(w http.ResponseWriter, r *http.Request) {
 
 	task, err := h.r.Find(r.Context(), id)
 	if err != nil {
-		if errors.Is(err, domain.ErrTaskNotFound) {
+		if errors.Is(err, infrastructure.ErrTaskNotFound) {
 			h.handleFail(err, http.StatusNotFound, w)
 			return
 		}

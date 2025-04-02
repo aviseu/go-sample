@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/aviseu/go-sample/internal/app/application"
 	"github.com/aviseu/go-sample/internal/app/domain"
+	"github.com/aviseu/go-sample/internal/app/infrastructure/aggregators"
 	"github.com/aviseu/go-sample/internal/testutils"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/suite"
@@ -37,7 +38,7 @@ func (suite *HandlerSuite) TestCreateSuccess() {
 
 	// Assert state
 	suite.Len(r.Records, 1)
-	var task *domain.Task
+	var task *aggregators.Task
 	for _, t := range r.Records {
 		task = t
 	}
@@ -110,7 +111,7 @@ func (suite *HandlerSuite) TestCreateRepositoryFail() {
 func (suite *HandlerSuite) TestMarkCompletedSuccess() {
 	// Prepare
 	id := uuid.New()
-	r := testutils.NewTaskRepository(testutils.TaskRepositoryWithTask(&domain.Task{ID: id, Title: "task 1", Completed: false}))
+	r := testutils.NewTaskRepository(testutils.TaskRepositoryWithTask(&aggregators.Task{ID: id, Title: "task 1", Completed: false}))
 	s := domain.NewService(r)
 	lbuf, log := testutils.NewLogger()
 	h := application.APIHandler(log, s, r)
@@ -164,7 +165,8 @@ func (suite *HandlerSuite) TestMarkCompletedNotFound() {
 	lbuf, log := testutils.NewLogger()
 	h := application.APIHandler(log, s, r)
 
-	req := httptest.NewRequest(oghttp.MethodPut, "/api/tasks/"+uuid.New().String()+"/complete", nil)
+	id := uuid.New().String()
+	req := httptest.NewRequest(oghttp.MethodPut, "/api/tasks/"+id+"/complete", nil)
 	rr := httptest.NewRecorder()
 
 	// Execute
@@ -176,7 +178,7 @@ func (suite *HandlerSuite) TestMarkCompletedNotFound() {
 	// Assert result
 	suite.Equal(oghttp.StatusNotFound, rr.Code)
 	suite.Equal("application/json", rr.Header().Get("Content-Type"))
-	suite.Equal(`{"message":"failed to find task: task not found"}`+"\n", rr.Body.String())
+	suite.Equal(`{"message":"task not found: `+id+`"}`+"\n", rr.Body.String())
 
 	// Assert log
 	suite.Empty(lbuf.String())

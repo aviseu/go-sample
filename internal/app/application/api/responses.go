@@ -1,6 +1,8 @@
 package api
 
-import "github.com/aviseu/go-sample/internal/app/domain"
+import (
+	"github.com/aviseu/go-sample/internal/app/infrastructure/aggregators"
+)
 
 type ErrorResponse struct {
 	Message string `json:"message"`
@@ -11,12 +13,12 @@ func NewErrorResponse(err error) *ErrorResponse {
 }
 
 type TaskListResponse struct {
-	Tasks []*domain.Task `json:"tasks"`
+	Tasks []*aggregators.Task `json:"tasks"`
 }
 
-func NewTaskListResponse(tasks []*domain.Task) *TaskListResponse {
+func NewTaskListResponse(tasks []*aggregators.Task) *TaskListResponse {
 	if tasks == nil {
-		tasks = []*domain.Task{}
+		tasks = []*aggregators.Task{}
 	}
 	return &TaskListResponse{
 		Tasks: tasks,

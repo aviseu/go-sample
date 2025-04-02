@@ -2,7 +2,8 @@ package postgres_test
 
 import (
 	"context"
-	"github.com/aviseu/go-sample/internal/app/domain"
+	"github.com/aviseu/go-sample/internal/app/infrastructure"
+	"github.com/aviseu/go-sample/internal/app/infrastructure/aggregators"
 	"github.com/aviseu/go-sample/internal/app/infrastructure/postgres"
 	"github.com/aviseu/go-sample/internal/testutils"
 	"github.com/google/uuid"
@@ -87,7 +88,7 @@ func (suite *TaskRepositorySuite) TestFindNotFound() {
 	// Assert
 	suite.Error(err)
 	suite.Nil(task)
-	suite.ErrorIs(err, domain.ErrTaskNotFound)
+	suite.ErrorIs(err, infrastructure.ErrTaskNotFound)
 }
 
 func (suite *TaskRepositorySuite) TestFindRepositoryFail() {
@@ -107,7 +108,7 @@ func (suite *TaskRepositorySuite) TestFindRepositoryFail() {
 func (suite *TaskRepositorySuite) TestSaveNewSuccess() {
 	// Prepare
 	id := uuid.New()
-	task := &domain.Task{ID: id, Title: "task 1"}
+	task := &aggregators.Task{ID: id, Title: "task 1"}
 	r := postgres.NewTaskRepository(suite.DB)
 
 	// Execute
@@ -120,7 +121,7 @@ func (suite *TaskRepositorySuite) TestSaveNewSuccess() {
 	suite.False(task.Completed)
 
 	// Assert state
-	var dbTasks []*domain.Task
+	var dbTasks []*aggregators.Task
 	err = suite.DB.Select(&dbTasks, "SELECT * FROM tasks")
 	suite.NoError(err)
 	suite.Len(dbTasks, 1)
@@ -135,7 +136,7 @@ func (suite *TaskRepositorySuite) TestSaveExistingSuccess() {
 	_, err := suite.DB.Exec("INSERT INTO tasks (id, title, completed) VALUES ($1, $2, $3)", id.String(), "task 1", false)
 	suite.NoError(err)
 
-	task := &domain.Task{ID: id, Title: "task 1 updated", Completed: true}
+	task := &aggregators.Task{ID: id, Title: "task 1 updated", Completed: true}
 	r := postgres.NewTaskRepository(suite.DB)
 
 	// Execute
@@ -148,7 +149,7 @@ func (suite *TaskRepositorySuite) TestSaveExistingSuccess() {
 	suite.True(task.Completed)
 
 	// Assert state
-	var dbTasks []*domain.Task
+	var dbTasks []*aggregators.Task
 	err = suite.DB.Select(&dbTasks, "SELECT * FROM tasks")
 	suite.NoError(err)
 	suite.Len(dbTasks, 1)
@@ -162,7 +163,7 @@ func (suite *TaskRepositorySuite) TestSaveRepositoryFail() {
 	r := postgres.NewTaskRepository(suite.BadDB)
 
 	// Execute
-	err := r.Save(context.Background(), &domain.Task{})
+	err := r.Save(context.Background(), &aggregators.Task{})
 
 	// Assert
 	suite.Error(err)
