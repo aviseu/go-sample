@@ -21,11 +21,11 @@ func SetupServer(cfg Config, h http.Handler) http.Server {
 	}
 }
 
-func APIHandler(log *slog.Logger, s *domain.Service) http.Handler {
-	r := chi.NewRouter()
+func APIHandler(log *slog.Logger, s *domain.Service, r api.Repository) http.Handler {
+	router := chi.NewRouter()
 
-	h := api.NewHandler(log, s)
-	r.Mount("/api/tasks", h.Routes())
+	h := api.NewHandler(log, s, r)
+	router.Mount("/api/tasks", h.Routes())
 
-	return r
+	return router
 }

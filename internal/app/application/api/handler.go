@@ -1,6 +1,7 @@
 package api
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"github.com/aviseu/go-sample/internal/app/domain"
@@ -11,13 +12,23 @@ import (
 	"net/http"
 )
 
+type Repository interface {
+	All(ctx context.Context) ([]*domain.Task, error)
+	Find(ctx context.Context, id uuid.UUID) (*domain.Task, error)
+}
+
 type Handler struct {
 	log *slog.Logger
 	s   *domain.Service
+	r   Repository
 }
 
-func NewHandler(log *slog.Logger, s *domain.Service) *Handler {
-	return &Handler{log: log, s: s}
+func NewHandler(log *slog.Logger, s *domain.Service, r Repository) *Handler {
+	return &Handler{
+		log: log,
+		s:   s,
+		r:   r,
+	}
 }
 
 func (h *Handler) Routes() http.Handler {
@@ -32,7 +43,7 @@ func (h *Handler) Routes() http.Handler {
 }
 
 func (h *Handler) All(w http.ResponseWriter, r *http.Request) {
-	tasks, err := h.s.All(r.Context())
+	tasks, err := h.r.All(r.Context())
 	if err != nil {
 		h.handleError(err, w)
 		return
@@ -107,7 +118,7 @@ func (h *Handler) Find(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	task, err := h.s.Find(r.Context(), id)
+	task, err := h.r.Find(r.Context(), id)
 	if err != nil {
 		if errors.Is(err, domain.ErrTaskNotFound) {
 			h.handleFail(err, http.StatusNotFound, w)

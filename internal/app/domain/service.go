@@ -7,7 +7,6 @@ import (
 )
 
 type Repository interface {
-	All(ctx context.Context) ([]*Task, error)
 	Find(ctx context.Context, id uuid.UUID) (*Task, error)
 	Save(ctx context.Context, task *Task) error
 }
@@ -46,12 +45,4 @@ func (s *Service) MarkCompleted(ctx context.Context, id uuid.UUID) error {
 	}
 
 	return nil
-}
-
-func (s *Service) All(ctx context.Context) ([]*Task, error) {
-	return s.r.All(ctx)
-}
-
-func (s *Service) Find(ctx context.Context, id uuid.UUID) (*Task, error) {
-	return s.r.Find(ctx, id)
 }

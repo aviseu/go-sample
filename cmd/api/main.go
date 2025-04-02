@@ -59,7 +59,7 @@ func run(ctx context.Context) error {
 
 	// setup server
 	log.Info("setting up server...")
-	server := application.SetupServer(cfg.API, application.APIHandler(log, ts))
+	server := application.SetupServer(cfg.API, application.APIHandler(log, ts, tr))
 	serverErrors := make(chan error, 1)
 
 	go func() {
